@@ -36,5 +36,5 @@ if __name__ == "__main__":
         input_message = input("请输入测试消息 (或输入 'exit' 退出): ")
         if input_message.lower() == 'exit':
             break
-        result = asyncio.run(async_test(message=input_message, target=["L1", "L2", "L3"], mask=["L1", "L3", "L4"], mode="Intersection"))
+        result = asyncio.run(async_test(message=input_message, target=["L4", "L2", "L3"], mask=["L1", "L3", "L4"], mode="Union"))
         print(result)   
