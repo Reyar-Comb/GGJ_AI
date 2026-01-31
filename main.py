@@ -29,13 +29,14 @@ def test():
         "status": "success",
         "message": "API is working"
     })
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
     player_ip = request.remote_addr
     player_content = data.get('content', "")
     traits = data.get('traits', list())
-    background = f"年龄{data.get('age', "")}, 性别{data.get('sex', '')}, 背景故事{data.get('story', '')}"
+    background = f"年龄段{data.get('age_group', "")}, 性别{data.get('sex', '')}, 背景故事{data.get('story', '')}"
     patience = data.get('patience')
     print(f"收到玩家 [{player_ip}] 的消息: {player_content}, 特质: {traits}, 背景: {background}")
 
