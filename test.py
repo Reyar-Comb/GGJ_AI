@@ -29,11 +29,11 @@ def calculate_mask(target: str, mask: str, mode: str) -> list:
         return target_traits
     
 
-async def test(message: str, sex: str, age: str, story: str, target: str, mask: str, mode: str, patience: int):
+async def test(message: str, sex: str, age_group: str, story: str, target: str, mask: str, mode: str, patience: int):
     async with httpx.AsyncClient() as client:
         data = {
             "content": message,
-            "age": age,
+            "age_group": age_group,
             "sex": sex,
             "story": story,
             "traits": calculate_mask(target, mask, mode),
@@ -65,10 +65,10 @@ async def test(message: str, sex: str, age: str, story: str, target: str, mask: 
 
 
     
-def init_story(sex: str, age: str):
+def init_story(sex: str, age_group: str):
     with httpx.Client() as client:
         data = {
-            "age": age,
+            "age_group": age_group,
             "sex": sex,
             "traits": target_traits
         }
@@ -102,21 +102,22 @@ if __name__ == "__main__":
 
     target_traits = Persona.get(target, [])
     sex = input("请输入角色性别 (male/female): ")
-    age = input("请输入角色年龄: ")
-    init_story(sex=sex, age=age)
+    age_group = input("请输入角色年龄段: ")
+    init_story(sex=sex, age_group=age_group)
     while(True):
         mask_string = input("\n请输入面具，如\"P1U\", \"P2I\", U表示并集，I表示交集。如果仅输入\"P1\"则表示猜测人格 (或输入 'exit' 退出): ")
-        if len(mask_string) == 2 and mask_string == target:
-            print("恭喜你，猜对了角色人格!")
-            exit(0)
-        else:
-            print("猜错了，继续加油!")
+        if len(mask_string) == 2:
+            if mask_string == target:
+                print("恭喜你，猜对了角色人格!")
+                exit(0)
+            else:
+                print("猜错了，继续加油!")
         input_message = input("请输入问题: ")
         if mask_string.lower() == 'exit':
             break
         result = asyncio.run(test(
             message=input_message,
-            sex=sex, age=age, 
+            sex=sex, age_group=age_group, 
             story=story, 
             target=target, 
             mask=mask_string[:2], 

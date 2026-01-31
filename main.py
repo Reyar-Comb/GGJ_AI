@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 import os
 from dotenv import load_dotenv
-from chat import request_ai
+from chat import request_ai, process
+import json
+import random
+
 
 load_dotenv()
 
@@ -9,6 +12,9 @@ api_key = os.getenv("OPENAI_API_KEY")
 role_prompt: str = os.getenv("ROLE_PROMPT")  # type: ignore
 story_prompt: str = os.getenv("STORY_PROMPT")  # type: ignore
 chatrule_prompt: str = os.getenv("CHATRULE_PROMPT")  # type: ignore
+
+profile_str = open("resources/profile.json", "r", encoding="utf-8").read()
+profile_json = json.loads(profile_str)
 
 
 if role_prompt:
@@ -34,6 +40,8 @@ def chat():
         api_key=api_key, #type: ignore
         prompt=prompt
     )
+    print(ai_reply)
+    process(ai_reply, traits)
 
     return jsonify({
         "status": "success",
@@ -45,20 +53,20 @@ def chat():
 def story():
     data = request.json
     player_ip = request.remote_addr
-    age = data.get('age')
+    age_group = data.get('age_group')
     sex = data.get('sex')
-    traits = data.get('Traits', list())
-    print(f"收到故事请求: 年龄: {age}, 性别: {sex}, 特质: {traits}")
-    prompt = f"{role_prompt} \n {story_prompt} \n 年龄: {age}, 性别: {sex}, 特质: {traits}"
-    ai_reply = request_ai(
-        message="",
-        api_key=api_key,  # type: ignore
-        prompt=prompt
-    )
+    print(f"收到玩家 [{player_ip}] 的消息: 年龄段: {age_group}, 性别: {sex}")
+
+    matches = [p for p in profile_json if p["age_group"] == int(age_group) and p["sex"] == sex]  # type: ignore
+    if matches:
+        story_text = random.choice(matches)["story"]  # type: ignore
+    else:
+        story_text = "我是伪人"
+
     return jsonify({
         "status": "success",
         "player_ip": player_ip,
-        "reply": ai_reply
+        "reply": f"{{\"story\": \"{story_text}\"}}"
     })
 
 def main():
