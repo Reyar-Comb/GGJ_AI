@@ -23,7 +23,12 @@ else:
     print("错误：未能读取到 ROLE_PROMPT，请检查 .env 文件路径和格式")
 
 app = Flask(__name__)
-
+@app.route('/api/test', methods=['GET'])
+def test():
+    return jsonify({
+        "status": "success",
+        "message": "API is working"
+    })
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
